@@ -1,0 +1,6 @@
+framework module Pods_TheHelpStack {
+  umbrella header "Pods-TheHelpStack-umbrella.h"
+
+  export *
+  module * { export * }
+}
