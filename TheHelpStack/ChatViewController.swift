@@ -21,7 +21,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         setupViews()
         checkifUserLoggedIn()
-        fetchUser()
         
         observeMessages()
         
@@ -29,6 +28,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
     }
+    
     
     let tableViewz: UITableView = {
         let tv = UITableView()
@@ -168,19 +168,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
-    func fetchUser()
-    {
-        FIRDatabase.database().reference().child("users").observe(.childAdded, with: { (snapshot) in
-            if let _ = snapshot.value as? [String: Any] {
-                
-                self.messages.append(snapshot)
-            }
-            
-            DispatchQueue.main.async() {
-                self.tableViewz.reloadData()
-            }
-        })
-    }
     
     func handleLogout()
     {
@@ -244,10 +231,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func observeMessages() {
         FIRDatabase.database().reference().child("messages").observe(.childAdded, with: { (snapshot) -> Void in
             
-            self.messages.insert(snapshot, at: 0)
+            self.messages.append(snapshot)
+            let indexpath = IndexPath(row: self.messages.count - 1, section: 0)
             
             DispatchQueue.main.async() {
                 self.tableViewz.reloadData()
+                self.tableViewz.scrollToRow(at: indexpath, at: .bottom, animated: true)
             }
         })
     }
